@@ -72,7 +72,6 @@ class UpdateFragment : Fragment() {
             } else {
                 radioGroup.check(R.id.radio_female)
             }
-
         }
     }
 
@@ -91,7 +90,13 @@ class UpdateFragment : Fragment() {
             // submit btn
             submitBtn.setOnClickListener {
                 if (isValidData()) {
-                    val userData = UserData(registerName.text.toString(), email.text.toString(), password2.text.toString(), radioBtnString, date.text.toString())
+                    val userData = UserData(
+                        registerName.text.toString(),
+                        email.text.toString(),
+                        password2.text.toString(),
+                        radioBtnString,
+                        date.text.toString()
+                    )
                     viewModel.addUserData(userData)
                     viewModel.getUserData(userData.email).observe(viewLifecycleOwner) {
                         if (it != null) {
@@ -111,7 +116,7 @@ class UpdateFragment : Fragment() {
             if (registerName.text.isNullOrBlank() || password.text.isNullOrBlank() || password2.text.isNullOrBlank() || date.text.isNullOrBlank()) {
                 Snackbar.make(root, "Please enter all fields!", Snackbar.LENGTH_SHORT).show()
                 return false
-            } else if (password.text.toString() != password2.text.toString()){
+            } else if (password.text.toString() != password2.text.toString()) {
                 Snackbar.make(root, "Password doesn't match!", Snackbar.LENGTH_SHORT).show()
                 return false
             }

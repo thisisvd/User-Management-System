@@ -5,11 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.usermanagementsystem.R
-import com.example.usermanagementsystem.data.model.UserData
 import com.example.usermanagementsystem.databinding.FragmentLoginBinding
 import com.example.usermanagementsystem.ui.viewmodels.MainViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -35,9 +36,11 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
 
+            // handle on back clicked
+            onBack()
+
             // on click listeners
             setupOnClickListeners()
-
         }
     }
 
@@ -53,7 +56,6 @@ class LoginFragment : Fragment() {
             goToRegister.setOnClickListener {
                 findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
             }
-
         }
     }
 
@@ -68,7 +70,10 @@ class LoginFragment : Fragment() {
                             if (userData.email == loginEmail.text.toString() && userData.password == loginPassword.text.toString()) {
                                 val bundle = bundleOf()
                                 bundle.putString("userEmail", userData.email)
-                                findNavController().navigate(R.id.action_loginFragment_to_homeFragment,bundle)
+                                findNavController().navigate(
+                                    R.id.action_loginFragment_to_homeFragment,
+                                    bundle
+                                )
                             } else {
                                 Snackbar.make(root, "Wrong Password", Snackbar.LENGTH_SHORT)
                                     .show()
@@ -84,6 +89,14 @@ class LoginFragment : Fragment() {
             } else {
                 Snackbar.make(root, "Please enter all fields!", Snackbar.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    // handle onBack pressed
+    private fun onBack() {
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            // Handle the back button event
+            requireActivity().finish()
         }
     }
 

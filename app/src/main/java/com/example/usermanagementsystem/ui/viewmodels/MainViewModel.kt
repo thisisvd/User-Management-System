@@ -9,7 +9,7 @@ import com.example.usermanagementsystem.data.model.UserData
 import com.example.usermanagementsystem.data.model.UserDatabase
 import kotlinx.coroutines.launch
 
-class MainViewModel: ViewModel() {
+class MainViewModel : ViewModel() {
 
     // init db
     private lateinit var db: UserDao

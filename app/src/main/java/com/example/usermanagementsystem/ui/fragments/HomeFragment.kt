@@ -6,10 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.example.usermanagementsystem.R
 import com.example.usermanagementsystem.data.model.UserData
 import com.example.usermanagementsystem.databinding.FragmentHomeBinding
@@ -28,11 +28,14 @@ class HomeFragment : Fragment() {
     // local user data
     private lateinit var userData: UserData
 
+    // delete local variable
+    private var isDeleteClicked = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentHomeBinding.inflate(layoutInflater,container,false)
+        _binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
@@ -40,12 +43,14 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
 
+            // handle on back clicked
+            onBack()
+
             // observer
             viewModelObservers()
 
             // onclick listeners
             onClickListeners()
-
         }
     }
 
@@ -55,28 +60,29 @@ class HomeFragment : Fragment() {
 
             // on update click
             updateBtn.setOnClickListener {
-                // do something.
                 val bundle = bundleOf()
-                bundle.putString("userEmail",userData.email)
-                findNavController().navigate(R.id.action_homeFragment_to_updateFragment,bundle)
+                bundle.putString("userEmail", userData.email)
+                findNavController().navigate(R.id.action_homeFragment_to_updateFragment, bundle)
             }
 
             // on delete click listener
             deleteBtn.setOnClickListener {
-                if(userData != null) {
+                if (userData != null) {
                     viewModel.deleteUserData(userData)
+                    isDeleteClicked = true
                     viewModel.getUserData(userData.email).observe(viewLifecycleOwner) {
                         if (it == null) {
                             findNavController().popBackStack()
                         }
                     }
                 } else {
-                    Snackbar.make(root,"Some error occurred!",Toast.LENGTH_SHORT).show()
+                    Snackbar.make(root, "Some error occurred!", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
+    // view model observers
     private fun viewModelObservers() {
         binding.apply {
             viewModel.apply {
@@ -85,11 +91,14 @@ class HomeFragment : Fragment() {
                 val email = arguments?.getString("userEmail")
                 if (!email.isNullOrBlank()) {
                     getUserData(email).observe(viewLifecycleOwner) { data ->
-                        if (data != null) {
-                            userData = data
-                            showDataInUI(userData)
-                        } else {
-                            Snackbar.make(root, "Some error occurred!", Toast.LENGTH_SHORT).show()
+                        if (!isDeleteClicked) {
+                            if (data != null) {
+                                userData = data
+                                showDataInUI(userData)
+                            } else {
+                                Snackbar.make(root, "Some error occurred!", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
                         }
                     }
                 } else {
@@ -117,9 +126,11 @@ class HomeFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModelObservers()
+    // handle onBack pressed
+    private fun onBack() {
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            // do nothing...
+        }
     }
 
     override fun onDestroyView() {
